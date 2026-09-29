@@ -53,6 +53,7 @@ details[open] summary::after{content:" ▴"}
 .shift{display:grid;grid-template-columns:64px minmax(0,1fr) minmax(0,1fr);gap:8px;padding:10px;border:1px solid var(--line);border-radius:10px;align-items:end}
 .shift .times{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end}
 .shift.missing{border-color:var(--warn);background:var(--warn-bg)}
+.shift > div, .shift .times > div{min-width:0}
 .shift small{display:block;font-size:.75rem;color:var(--muted);margin-bottom:2px}
 .shift .del{padding:8px 10px}
 @media (min-width:620px){
@@ -97,15 +98,34 @@ h1 .beta{display:inline-block;vertical-align:middle;font-size:.8rem;font-weight:
 .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
 .stat b{display:block;font-size:1.35rem;line-height:1.2}
 .stat span{font-size:.78rem;color:var(--muted)}
-.rank{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:6px}
-.rank li{display:grid;grid-template-columns:2.2em 1fr auto;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
-.rank li.me{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.rank li.first{background:color-mix(in srgb,#E8B423 18%,var(--bg));border-color:#C99A12}
-.rank .pos{font-weight:700;text-align:center;font-size:1.05rem}
-.rank .cnt{font-weight:700;font-variant-numeric:tabular-nums}
-.winner{margin-top:14px;padding:16px;border-radius:14px;text-align:center;background:color-mix(in srgb,#E8B423 20%,var(--surface));border:1px solid #C99A12}
-.winner .cup{font-size:2.6rem;line-height:1}
-.winner b{display:block;font-size:1.2rem;margin-top:4px}
+select{-webkit-appearance:none;appearance:none;padding-right:26px;max-width:100%;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 14px) 55%,calc(100% - 9px) 55%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+input[type=time]{min-width:0;-webkit-appearance:none;appearance:none;min-height:40px}
+.calc summary{font-size:.85rem;font-weight:400;color:var(--accent)}
+.calc summary::after{content:""}
+.calc p{margin-top:6px}
+@media (max-width:560px){
+  main{padding:18px 12px 40px}
+  h1{font-size:1.6rem}
+  .lede{margin-bottom:14px}
+  section{padding:14px;border-radius:12px;margin-bottom:12px}
+  .disclaimer{font-size:.82rem;padding:8px 10px}
+  .drop{padding:18px 12px}
+  .cal-title{font-size:1.3rem}
+  .cal-head > div{max-width:none!important;width:100%}
+  .grid{gap:3px}
+  .shift{grid-template-columns:72px minmax(0,1fr);padding:8px;gap:6px}
+  .shift > div, .shift .times > div{min-width:0}
+  .shift > div:nth-child(3){grid-column:1/-1}
+  .shift .times{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;gap:6px}
+  .shift .del{padding:8px 0;min-height:40px}
+  .export{position:sticky;bottom:0;z-index:5;background:var(--surface);margin:12px -14px -14px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+    border-top:1px solid var(--line);border-radius:0 0 12px 12px}
+  .export button{flex:1 1 100%;min-height:48px}
+  .stat b{font-size:1.2rem}
+}
+*,*::before,*::after{box-sizing:border-box}
 footer{color:var(--muted);font-size:.8rem;text-align:center;margin-top:24px}
 footer a{color:inherit}
 @media (prefers-reduced-motion:no-preference){.day{transition:border-color .15s}.day:hover{border-color:var(--accent)}}
@@ -115,7 +135,7 @@ footer a{color:inherit}
 <main>
   <div id="nojs" class="msg" style="margin-bottom:16px"><strong>Die App läuft hier nicht.</strong> Diese Ansicht führt keine Programme aus, zum Beispiel die Vorschau der iPhone-Dateien-App. Bitte die App über ihren Link (Webadresse) in Safari oder Chrome öffnen.</div>
   <h1>Mein Dienstplan<span class="beta">Beta</span></h1>
-  <p class="lede">Dienstplan hochladen, Namen wählen, Kalenderdatei herunterladen. Alles passiert auf deinem Gerät, der Plan wird nirgendwohin geschickt.</p>
+  <p class="lede">Plan hochladen, Namen eintragen, Kalenderdatei laden. Alles bleibt auf deinem Gerät.</p>
   <p class="disclaimer" style="margin:-12px 0 24px"><strong>Beta-Version.</strong> Der Ersteller übernimmt keine Haftung für die Richtigkeit der erkannten Dienste, Zeiten und Stunden. Du bist selbst dafür verantwortlich, das Ergebnis mit dem offiziellen Dienstplan abzugleichen.</p>
 
   <section>
@@ -148,28 +168,16 @@ footer a{color:inherit}
     <p class="hint mt">Tippe auf einen Tag, um ihn zu ändern.</p>
     <div class="grid" id="grid"></div>
     <div class="stats" id="stats"></div>
-    <p class="hint mt" id="statsNote"></p>
+    <details class="calc mt"><summary>So wird gerechnet</summary><p class="hint" id="statsNote"></p></details>
     <p class="summary" id="summary"></p>
+    <p class="disclaimer mt">Vor dem Übernehmen in den Kalender bitte jeden Tag mit dem offiziellen Plan vergleichen. Beta-Version, keine Gewähr.</p>
+    <p class="hint mt" id="exportHint"></p>
     <div class="export">
       <button class="primary" id="exportBtn">Kalenderdatei herunterladen</button>
       <button id="shareBtn" class="hidden">Teilen / In Kalender öffnen</button>
     </div>
-    <p class="hint mt" id="exportHint"></p>
-    <p class="disclaimer mt">Vor dem Übernehmen in den Kalender bitte jeden Tag mit dem offiziellen Plan vergleichen. Beta-Version, keine Gewähr.</p>
   </section>
 
-  <section id="rankBox" class="hidden">
-    <h2>Rangliste: Wer hat die meisten Dienste?</h2>
-    <p class="hint">Zählt Bereitschafts- und Rufdienste (Nacht, Wochenende, BD, RBD) aller Personen im Plan. Nur zum Spaß, keine offizielle Auswertung. Bei Bild-PDFs werden alle Zeilen per Texterkennung gelesen, das kann auf dem Handy länger dauern.</p>
-    <div class="row mt">
-      <button class="primary" id="rankBtn">Rangliste erstellen</button>
-      <button id="rankStop" class="hidden">Abbrechen</button>
-    </div>
-    <p class="hint mt" id="rankMsg"></p>
-    <progress id="rankProg" class="hidden" max="1" value="0" style="width:100%"></progress>
-    <div id="winner"></div>
-    <ol class="rank" id="rankList"></ol>
-  </section>
 
   <section>
     <details id="shiftBox">
@@ -662,7 +670,7 @@ function renderShifts(){
       <div class="times">
         <div><small>Beginn</small><input type="time" data-k="start"></div>
         <div><small>Ende</small><input type="time" data-k="end"></div>
-        <button class="del" aria-label="Schicht löschen">Löschen</button>
+        <button class="del" aria-label="Schicht löschen" title="Löschen">✕</button>
       </div>`;
     el.querySelectorAll("[data-k]").forEach(inp => {
       const k = inp.dataset.k;
@@ -889,7 +897,7 @@ function readSheet(buf, isCsv){
 /* ---------- OCR for image PDFs (on device) ---------- */
 const EXTRA = ["v39","v20","ZU","C","FZ","EZ","SU","MU","AIN","AIS","AIF","HP","IRS","ROF","K","Y","FI","if","iz","is","in","AF","2TN","2TW","1N+","2N+","TI","IZ"];
 const known = () => new Set([...Object.keys(CAT), ...EXTRA, ...state.shifts.map(s => s.code)]);
-const CONF = { "0":["O","Q"],"O":["0","Q"],"Q":["O"],"1":["I","l"],"I":["1"],"l":["I","1"],"5":["S"],"S":["5"],"8":["B","3"],"B":["8"],"2":["Z"],"Z":["2"],"6":["G"],"G":["6","O","C"],"C":["O","G"],"D":["O"],"U":["O"],"s":["S"],"z":["Z"],"i":["I"],"n":["N"],"f":["F"],"|":["I"] };
+const CONF = { "0":["O","Q"],"O":["0","Q"],"Q":["O"],"1":["I","l"],"I":["1"],"l":["I","1"],"5":["S"],"S":["5"],"8":["B","3"],"B":["8"],"2":["Z"],"Z":["2"],"6":["G"],"G":["6","O","C"],"C":["O","G"],"D":["O"],"U":["O"],"s":["S"],"z":["Z"],"i":["I"],"n":["N"],"f":["F"],"|":["I"],"7":["T"],"T":["7"] };
 function variantsOf(t){
   let out = [""];
   for (const ch of t){ const opts = [ch, ...(CONF[ch] || [])]; const nx = []; for (const o of out) for (const c of opts) nx.push(o + c); out = nx.slice(0, 400); }
@@ -909,20 +917,40 @@ function snapCode(raw){
 }
 let tess = null;
 let tessDe = null, wURLc = null;
+const BYTES = {};
 function b64bytes(id){
-  const raw = atob(document.getElementById(id).textContent.trim());
-  const bin = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) bin[i] = raw.charCodeAt(i); return bin;
+  if (BYTES[id]) return BYTES[id].slice(0);
+  const el = document.getElementById(id);
+  const raw = atob(el.textContent.trim());
+  const bin = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) bin[i] = raw.charCodeAt(i);
+  BYTES[id] = bin; el.textContent = "";            // keep the bytes once, drop the big text from the page
+  return bin.slice(0);
 }
 async function makeWorker(code, id){
   // core + worker in ONE blob: no importScripts of a second blob (fails when the page is opened as a local file)
-  if (!wURLc) wURLc = URL.createObjectURL(new Blob([document.getElementById("tess-core").textContent, "\n;\n", document.getElementById("tess-worker").textContent], { type: "application/javascript" }));
+  if (!wURLc){
+    const core = document.getElementById("tess-core"), wk = document.getElementById("tess-worker");
+    wURLc = URL.createObjectURL(new Blob([core.textContent, "\n;\n", wk.textContent], { type: "application/javascript" }));
+    core.textContent = ""; wk.textContent = "";
+  }
   return Tesseract.createWorker([{ code, data: b64bytes(id) }], 1, { workerPath: wURLc, workerBlobURL: false, corePath: "inline-core.js", cacheMethod: "none", gzip: true });
 }
-async function getOcr(){
-  if (!tess) tess = await makeWorker("eng", "tess-eng");      // codes in cells
-  if (!tessDe) tessDe = await makeWorker("deu", "tess-deu");  // names with umlauts
+/* only one recognition model in memory at a time (iPhones close pages that use too much memory) */
+async function useModel(which){
+  if (which === "deu"){
+    if (tess){ await tess.terminate(); tess = null; }
+    if (!tessDe) tessDe = await makeWorker("deu", "tess-deu");
+    return tessDe;
+  }
+  if (tessDe){ await tessDe.terminate(); tessDe = null; }
+  if (!tess) tess = await makeWorker("eng", "tess-eng");
   return tess;
 }
+async function freeModels(){
+  if (tess){ await tess.terminate(); tess = null; }
+  if (tessDe){ await tessDe.terminate(); tessDe = null; }
+}
+async function getOcr(){ return useModel("deu"); }
 async function ocr(canvas, psm, whitelist, worker){
   const W = worker || tess;
   await W.setParameters({ tessedit_pageseg_mode: String(psm), tessedit_char_whitelist: whitelist || "", preserve_interword_spaces: "1" });
@@ -1053,6 +1081,7 @@ function prog(v, text){ const p = $("#prog"); if (v == null){ p.classList.add("h
 
 async function ocrPdf(buf){
   if (!state.name){ say("Trag oben zuerst deinen Namen ein und lade die Datei dann erneut."); nameInput.focus(); return null; }
+  try{ sessionStorage.setItem("dp.busy", "1"); }catch{}
   try{
     prog(0.02, "Texterkennung wird gestartet …");
     await getOcr();
@@ -1084,7 +1113,7 @@ async function ocrPdf(buf){
       }
       if (state.pick && cands.some(c => c.label === state.pick)) break;
     }
-    if (!cands.length){ prog(null); say(`„${state.name}“ wurde im Plan nicht gefunden. Prüf die Schreibweise, am besten nur den Nachnamen.`); return null; }
+    if (!cands.length){ prog(null); freeModels().catch(() => {}); say(`„${state.name}“ wurde im Plan nicht gefunden. Prüf die Schreibweise, am besten nur den Nachnamen.`); return null; }
     // exact name matches beat fuzzy ones ("Bräu" should not offer "Braun")
     const bestScore = Math.min(...cands.map(c => c.score ?? 1));
     // ask who, if needed
@@ -1100,6 +1129,7 @@ async function ocrPdf(buf){
       });
     }
     prog(0.65, `${sel.label} gefunden. Kopfzeile wird gelesen …`);
+    await useModel("eng");
     const pg = await renderPage(pdf, sel.page, S);
     const x0 = Math.round(pg.width * 0.158), hh = 60 * S;
     const tries = [];
@@ -1114,7 +1144,7 @@ async function ocrPdf(buf){
       if (f && f.n >= 10){ fit = f; hdr = h; break; }
     }
     if (fit) fit.a += fit.b * 0.5 - 2 * S;
-    if (!fit){ prog(null); say("Die Datumszeile konnte nicht gelesen werden. Bitte ein anderes Format (Excel/CSV) verwenden."); return null; }
+    if (!fit){ prog(null); freeModels().catch(() => {}); say("Die Datumszeile konnte nicht gelesen werden. Bitte ein anderes Format (Excel/CSV) verwenden."); return null; }
     const rt = await ocr(hdr, 11, "");
     const mw = rt.words.map(w => w.text).filter(t => /^(jan|feb|m[aä]r|apr|mai|jun|jul|aug|sep|okt|nov|dez)/i.test(t));
     const cnt = {}; mw.forEach(t => { const k = t.slice(0, 3).toLowerCase(); cnt[k] = (cnt[k] || 0) + 1; });
@@ -1180,133 +1210,27 @@ async function ocrPdf(buf){
     // unknown readings: borrow a neighbouring day's code if it is one letter away (T -> TI, M -> QM)
     for (const d of Object.keys(days).map(Number)){
       const c = days[d]; if (K.has(c) || c === "?") continue;
-      const nb = [days[d - 1], days[d + 1], days[d - 2], days[d + 2]].find(x => x && K.has(x) && lev(x.toUpperCase(), c.toUpperCase()) <= 1);
-      if (nb){ days[d] = nb; unsure.add(d); }
+      const nb = [days[d - 1], days[d + 1], days[d - 2], days[d + 2]].find(x => x && K.has(x) && lev(x.toUpperCase(), c.toUpperCase()) <= (c.length >= 3 && x.length >= 3 ? 2 : 1));
+      let pickNb = nb;
+      if (!pickNb){
+        // otherwise the closest code used elsewhere in this row (unique best match only)
+        const pool = [...new Set(Object.values(days).filter(x => K.has(x)))].map(x => [x, lev(x.toUpperCase(), c.toUpperCase())]).sort((a, b) => a[1] - b[1]);
+        const lim = c.length >= 3 ? 2 : 1;
+        if (pool.length && pool[0][1] <= lim && (pool.length === 1 || pool[1][1] > pool[0][1])) pickNb = pool[0][0];
+      }
+      if (pickNb){ days[d] = pickNb; unsure.add(d); }
     }
     pg.width = pg.height = 0;
+    await freeModels();
     prog(null);
     return { cands: [{ label: sel.label, days }], month: { month, year }, wd, text: "", ocr: true, guessed, unsure };
   }catch(e){
-    console.error(e); prog(null);
+    console.error(e); prog(null); freeModels().catch(() => {});
     say("Die Texterkennung ist fehlgeschlagen (" + String(e && (e.message || e) || "unbekannt").slice(0, 160) + "). Bitte noch einmal versuchen oder den Plan als Excel/CSV exportieren.");
     return null;
   }
 }
 
-
-/* ---------- Rangliste ---------- */
-const DUTY_RE = /^(1N[+N5-7]|16N|1T[WF]|2N[+N5-7]|26N|2T[WF]|3N[5-7]?|3TN?|4TN?|L4T|HB[1567]|HRK?|HIB|IT[WFB]|NO[1567N]|N6O|IOW|CR[1WK]?|-?KR|KRD|PKR|HLK|OKR|CAK|CSK|OSK|AFR|ASK|-?IR[LFZ5S]?)$/;
-const isDuty = c => DUTY_RE.test(String(c || "").trim());
-const personLine = t => /[A-Za-zÄÖÜäöüß]{2,}\s+[A-Za-zÄÖÜäöüß]{2,}/.test(t) && !/\d|\+\/-|mitarb|zählung|zahlung|dienst op|station|intensiv\s*\(|neue zeilen/i.test(t);
-let rankStop = false;
-function showRank(list){
-  list.sort((a, b) => b.n - a.n || a.label.localeCompare(b.label, "de"));
-  const me = norm(state.pick || state.name);
-  const top = list[0];
-  const winners = list.filter(x => x.n === top.n && top.n > 0);
-  $("#winner").innerHTML = top && top.n > 0 ? `<div class="winner"><div class="cup">🏆</div><b>1. Preis: ${winners.map(w => escapeHtml(w.label)).join(" &amp; ")}</b><span class="hint">${top.n} Dienste in diesem Monat</span></div>` : "";
-  const ol = $("#rankList"); ol.innerHTML = "";
-  let pos = 0, last = null, shown = 0;
-  list.forEach((x, i) => {
-    if (x.n !== last){ pos = i + 1; last = x.n; }
-    const isMe = me && norm(x.label).includes(norm(state.name));
-    if (shown >= 10 && !isMe) return;
-    if (x.n === 0 && !isMe) return;
-    shown++;
-    const li = document.createElement("li");
-    if (pos === 1 && x.n > 0) li.className = "first";
-    if (isMe) li.classList.add("me");
-    const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : pos + ".";
-    li.innerHTML = `<span class="pos">${medal}</span><span>${escapeHtml(x.label)}${isMe ? " (du)" : ""}</span><span class="cnt">${x.n}</span>`;
-    ol.appendChild(li);
-  });
-}
-const escapeHtml = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-function rankFromCands(cands){
-  const m = new Map();
-  for (const c of cands){
-    const cur = m.get(c.label) || {};
-    Object.assign(cur, c.days); m.set(c.label, cur);
-  }
-  return [...m.entries()].map(([label, days]) => ({ label, n: Object.values(days).filter(isDuty).length }));
-}
-async function rankOcr(buf){
-  await getOcr();
-  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  const S = 3, out = [], rp = $("#rankProg");
-  const WL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=";
-  for (let n = 1; n <= pdf.numPages && !rankStop; n++){
-    const pg = await renderPage(pdf, n, S);
-    if (isBlank(pg)){ pg.width = pg.height = 0; continue; }
-    const stripW = Math.round(pg.width * 0.158);
-    const r = await ocr(crop(pg, 0, 0, stripW, pg.height), 4, "", tessDe);
-    const lines = r.lines.filter(l => l.text.length > 1);
-    const mit = lines.find(l => /mitarb/i.test(l.text));
-    const people = lines.filter(l => personLine(l.text));
-    if (!people.length){ pg.width = pg.height = 0; continue; }
-    const ys = lines.filter(l => /[a-zäöüß]{3,}/i.test(l.text)).map(l => (l.bbox.y0 + l.bbox.y1) / 2).sort((a, b) => a - b);
-    const gaps = ys.slice(1).map((y, i) => y - ys[i]).filter(g => g > 20).sort((a, b) => a - b);
-    const rowGap = gaps[Math.floor(gaps.length / 3)] || 20 * S;
-    // columns
-    const x0 = stripW, tries = [];
-    if (mit) tries.push(Math.max(0, mit.bbox.y0 - 8 * S));
-    for (let y = 0; y < people[0].bbox.y0; y += 30 * S) tries.push(y);
-    let fit = null;
-    for (const hy0 of tries){
-      const rd = await ocr(crop(pg, x0, hy0, pg.width - x0, Math.min(60 * S, pg.height - hy0)), 11, "0123456789");
-      const pts = rd.words.map(w => ({ d: /^\d{1,2}$/.test(w.text) ? +w.text : null, x: x0 + w.bbox.x0 })).filter(p => p.d >= 1 && p.d <= 31);
-      const f = fitColumns(pts); if (f && f.n >= 10){ fit = f; break; }
-    }
-    if (!fit){ pg.width = pg.height = 0; continue; }
-    fit.a += fit.b * 0.5 - 2 * S;
-    const hH = rowGap * 0.42, hW = fit.b * 0.46;
-    for (let k = 0; k < people.length && !rankStop; k++){
-      const l = people[k];
-      rp.value = (n - 1 + k / people.length) / pdf.numPages;
-      $("#rankMsg").textContent = `Seite ${n} von ${pdf.numPages}: ${l.text}`;
-      const y = (l.bbox.y0 + l.bbox.y1) / 2, cells = [];
-      for (let d = 1; d <= 31; d++){
-        const cx = fit.a + fit.b * d; if (cx + hW > pg.width) break;
-        const c = cleanCell(crop(pg, cx - hW, y - hH, hW * 2, hH * 2, 2));
-        if (c.ink >= 0.01 && c.contrast >= 25) cells.push(c.canvas);
-      }
-      let cnt = 0;
-      if (cells.length){
-        const W = cells.reduce((a, c) => a + c.width + 30, 0), H = Math.max(...cells.map(c => c.height));
-        const row = document.createElement("canvas"); row.width = W; row.height = H;
-        const g = row.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
-        let x = 0; for (const c of cells){ g.drawImage(c, x, 0); x += c.width + 30; c.width = c.height = 0; }
-        const rr = await ocr(row, 7, WL + " ");
-        cnt = rr.text.split(/\s+/).filter(Boolean).map(t => snapCode(t).code).filter(isDuty).length;
-        row.width = row.height = 0;
-      }
-      out.push({ label: l.text.replace(/[^\p{L}\s\-]/gu, "").replace(/\s+/g, " ").trim(), n: cnt });
-    }
-    pg.width = pg.height = 0;
-  }
-  return out;
-}
-$("#rankBtn").addEventListener("click", async () => {
-  if (!state.src) return;
-  const btn = $("#rankBtn"); btn.disabled = true; rankStop = false;
-  $("#winner").innerHTML = ""; $("#rankList").innerHTML = "";
-  try{
-    let list;
-    if (state.src.ocr){
-      $("#rankStop").classList.remove("hidden"); $("#rankProg").classList.remove("hidden");
-      $("#rankMsg").textContent = "Texterkennung läuft …";
-      list = await rankOcr(state.lastBuf.slice(0));
-    } else list = rankFromCands(state.src.cands);
-    if (!list.length){ $("#rankMsg").textContent = "Keine Personen gefunden."; return; }
-    showRank(list);
-    $("#rankMsg").textContent = (rankStop ? "Abgebrochen, Teilergebnis. " : "") + `${list.length} Personen ausgewertet.` + (state.src.ocr ? " Per Texterkennung gezählt, einzelne Dienste können fehlen oder falsch erkannt sein." : "");
-  }catch(e){
-    console.error(e); $("#rankMsg").textContent = "Die Rangliste konnte nicht erstellt werden (" + String(e && (e.message || e)).slice(0, 120) + ").";
-  }finally{
-    btn.disabled = false; $("#rankStop").classList.add("hidden"); $("#rankProg").classList.add("hidden");
-  }
-});
-$("#rankStop").addEventListener("click", () => { rankStop = true; });
 
 /* ---------- choose person ---------- */
 async function choose(){
@@ -1358,7 +1282,7 @@ function applyPlan(plan, guessed, label){
   if (state.src && state.src.ocr) $("#msg").textContent += state.unsure && state.unsure.size ? ` Per Texterkennung gelesen, ${state.unsure.size} unsichere Tage sind rot umrandet. Bitte kurz mit dem Plan vergleichen.` : " Per Texterkennung gelesen: bitte kurz mit dem Plan vergleichen.";
   renderPlan();
   $("#result").classList.remove("hidden");
-  $("#rankBox").classList.remove("hidden");
+  if (window.innerWidth < 700) setTimeout(() => $("#result").scrollIntoView({ behavior: "smooth", block: "start" }), 50);
 }
 
 /* ---------- calendar ---------- */
@@ -1453,6 +1377,9 @@ $("#dlgClose").addEventListener("click", () => $("#dlg").close());
 
 /* ---------- file input ---------- */
 async function handleFile(f){
+  try{ await handleFileInner(f); } finally { try{ sessionStorage.removeItem("dp.busy"); }catch{} }
+}
+async function handleFileInner(f){
   if (!f) return;
   const ext = (f.name.split(".").pop() || "").toLowerCase();
   say(`„${f.name}“ (${Math.round(f.size / 1024)} KB) wird gelesen …`, true);
@@ -1541,6 +1468,12 @@ $("#shareBtn").addEventListener("click", async () => {
 });
 
 renderShifts();
+try{
+  if (sessionStorage.getItem("dp.busy")){
+    sessionStorage.removeItem("dp.busy");
+    say("Die letzte Auswertung wurde unterbrochen, vermutlich hatte das Handy zu wenig Arbeitsspeicher. Bitte andere Apps und Browser-Tabs schließen und die Datei noch einmal auswählen.");
+  }
+}catch{}
 })();
 </script>
 </body>
